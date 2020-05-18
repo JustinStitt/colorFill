@@ -3,12 +3,13 @@ import random
 import sys
 import numpy as np
 pygame.init()
-#7x8 (row,col)
+#7x8 (row,col) default. Try out 20x20!!!
 ROWS = 7
 COLS = 8
 colors = [(209, 84, 75),(63, 158, 209),(80, 199, 105),(85, 70, 117),(235, 226, 56),(45, 51, 51)]
+#sample extra colors , (255,255,255), (166,16,166),(235, 156, 21),(20, 201, 201)
 #setup
-cell_size = 100
+cell_size = 100#change cellsize if your monitor is not fitting everything on screen
 WIDTH, HEIGHT = (COLS * cell_size, ROWS * cell_size + 100)
 screen = pygame.display.set_mode((WIDTH,HEIGHT))
 pygame.display.set_caption("colorFill -- Justin Stitt")
@@ -39,13 +40,13 @@ class Game():
                 #manage blobs
                 remove = []
                 i = r * COLS + c
-                if(i == 6):
+                if(i == COLS - 2):
                     remove.append(colors[1])
-                if(i == 7):
+                if(i == COLS - 1):
                     _cell.color = colors[1]
-                if(i == 40):
+                if(i == ROWS * COLS - 2):# 40 = (8 * 5)  cols = 7 rows = 8
                     remove.append(colors[0])
-                if(i == 48):
+                if(i == COLS * (ROWS - 1)):
                     _cell.color = colors[0]
                 if(r > 0):#remove above color from pool
                     remove.append(cells[(r-1) * COLS + c].color)
@@ -57,17 +58,17 @@ class Game():
                 #end manage blobs
 
         #set bottom left and top right cells to red/blue respectively
-        self.player_territory[0].append(cells[48])
-        self.player_territory[1].append(cells[7])
-        cells[48].border_color = (255,255,255)
-        cells[48].border_thickness = 2
-        cells[7].border_color = (255,255,255)
-        cells[7].border_thickness = 2
+        self.player_territory[0].append(cells[COLS * (ROWS - 1)])
+        self.player_territory[1].append(cells[COLS - 1])
+        cells[COLS * (ROWS - 1)].border_color = (255,255,255)
+        cells[COLS * (ROWS - 1)].border_thickness = 5
+        cells[COLS - 1].border_color = (255,255,255)
+        cells[COLS - 1].border_thickness = 2
     def setup_choices(self):
         global choices
         for x in range(len(colors)):
-            _cell_pos_x = (cells[2].pos[0] + (cell_size//5)) + x * cell_size
-            _cell_pos_y = cells[55].pos[1] + cell_size +(cell_size//5)
+            _cell_pos_x = (cells[2].pos[0] + (cell_size//5)) + x * cell_size/1.5 + 15
+            _cell_pos_y = cells[(COLS * ROWS )- 1].pos[1] + cell_size +(cell_size//5)
             _cell_pos = (_cell_pos_x,_cell_pos_y)
             _cell = Cell(_cell_pos,colors[x])
             _cell.size /= 1.5
@@ -111,19 +112,19 @@ class Game():
         #check every cell to see if it is adjacent to player territory AND it is the chosen color
         for x in range(len(cells)):
             #check below
-            if(x <= 47):#not on bottom border
-                if(cells[x].color == chosen_color and is_in(cells[x+8],self.player_territory[_player_num - 1]) ):
+            if(x <= (ROWS - 1) * COLS - 1):#not on bottom border <= 47  (7x8)
+                if(cells[x].color == chosen_color and is_in(cells[x+COLS],self.player_territory[_player_num - 1]) ):
                     to_add.append(x)
             #check to the left
-            if(x % 8 != 0):#not on left border
+            if(x % COLS != 0):#not on left border
                 if(cells[x].color == chosen_color and is_in(cells[x-1],self.player_territory[_player_num - 1]) ):
                     to_add.append(x)
             #check above
-            if(x > 7):#not on top border
-                if(cells[x].color == chosen_color and is_in(cells[x-8],self.player_territory[_player_num - 1]) ):
+            if(x > ROWS):#not on top border
+                if(cells[x].color == chosen_color and is_in(cells[x-COLS],self.player_territory[_player_num - 1]) ):
                     to_add.append(x)
             #check to the right
-            if((x+1) % 8 != 0 and x < len(cells) - 1):#not on right border
+            if((x+1) % COLS != 0 and x < len(cells) - 1):#not on right border
                 if(cells[x].color == chosen_color and is_in(cells[x+1],self.player_territory[_player_num - 1]) ):
                     to_add.append(x)
         for num in to_add:
@@ -171,6 +172,13 @@ def update(game):
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_pos = pygame.mouse.get_pos()
             check_mouse_collision(mouse_pos,game)
+        elif event.type == pygame.KEYDOWN:#make a random move
+            if event.key == pygame.K_UP:
+                _r = random.randint(0,len(choices) - 1)
+                while(choices[_r].unavailable == True):
+                    _r = random.randint(0,len(choices) - 1)
+                game.choose_color(choices[_r].color)
+
     for cell in cells:
         cell.update()
     for choice in choices:
@@ -209,8 +217,9 @@ game = Game()
 
 while True:
     screen.fill(background_color)
-    screen.blit(p1text,(5,725))
-    screen.blit(p2text,(5,775))
+    y_pos = cells[ROWS * COLS - 1].pos[1] + cell_size + 15
+    screen.blit(p1text,(5,y_pos))
+    screen.blit(p2text,(5,y_pos + 50))
 
     update(game)
     render()
