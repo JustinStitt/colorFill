@@ -18,3 +18,6 @@ You can have as many colors(>= 2) as you want, however gameplay will vary with d
 
 ![](colorFillGIF2.gif)
 
+**Game Between Two AI's on 20x20 Grid with 10 Colors**
+
+![](colorFillGIF3.gif)
