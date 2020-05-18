@@ -9,6 +9,8 @@ By default there are 6 colors and you cannot, at any point in the game, choose t
 
 You can have as many colors(>= 2) as you want, however gameplay will vary with different amounts of colors.
 
+--new update: You can now scale the size of the grid. (longer --and more tedious-- games will ensue)
+
 **THRILLING GAMEPLAY**
 
 ![](colorFillGIF.gif)
